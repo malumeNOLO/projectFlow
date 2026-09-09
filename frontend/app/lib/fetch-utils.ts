@@ -20,12 +20,11 @@ const api = axios.create({
     },
 });
 
-export default api;
 
 api.interceptors.request.use((config) => {
     const token = localStorage.getItem("token");
     if(token) {
-        config.headers.Authorization = `Bearer ${token}`; //`Bearer gdffddfgsgbbvkc`
+        config.headers.Authorization = `Bearer ${token ?? ""}`; //`Bearer gdffddfgsgbbvkc`
     }
     return config;
 });
@@ -64,3 +63,5 @@ const deleteData = async<T>(path: string): Promise<T> => {
 };
 
 export { postData, fetchData, updateData, deleteData};
+
+export default api;

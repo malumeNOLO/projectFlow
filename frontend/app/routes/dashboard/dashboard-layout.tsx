@@ -5,8 +5,24 @@ import { Navigate, Outlet, useNavigate } from "react-router";
 import type { Workspace } from "@/types";
 import { Header } from "@/components/layout/header";
 import { SidebarComponent } from "@/components/layout/sidebar-component";
-import { CreateWorkspace } from "@/components/workspace/create=workspace";
+import { CreateWorkspace } from "@/components/workspace/create-workspace";
+import { fetchData } from "@/lib/fetch-utils"
 
+export const clientLoader = async() => {
+    try {
+      const [workspaces] = await Promise.all([
+        fetchData("/workspaces"),
+      ]);
+      return { workspaces };
+
+    } catch (error) {
+        console.error("Failed to fetch workspaces:", error);
+    }
+
+    return {
+        workspaces: [],
+    };
+};
 
 const DashboardLayout = () => {
     const { isAuthenticated, isLoading } = useAuth();
