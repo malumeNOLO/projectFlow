@@ -38,11 +38,19 @@ export const loginSchema = z.object({
         .min(8, "Password must be at least 8 characters"),
 });
 
-/*------------ Email ----------------*/
+/*----------------- Email ----------------*/
 
 export const verifyEmailSchema = z.object({
     token: z 
     .string().min(1,"Token is required"),
+});
+
+/*------------- Workspace ------------- */
+
+export const workspaceSchema = z.object({
+    name: z.string().min(1, "Name is required"),
+    description: z.string().optional(),
+    color: z.string().min(1, "Color is required"),
 });
 
 /*----------- Reset Password ----------*/

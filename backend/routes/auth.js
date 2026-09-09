@@ -3,7 +3,8 @@ import express from "express";
 import {z} from "zod";
 import { validateRequest } from "zod-express-middleware";
 import { loginUser, registerUser, verifyEmail, resetPasswordRequest, verifyResetPasswordTokenAndResetPassword } from "../controllers/auth-controller.js";
-import { registrationSchema, loginSchema, verifyEmailSchema, resetPasswordSchema } from "../libs/validate-schema.js";
+import { registrationSchema, loginSchema, verifyEmailSchema, resetPasswordSchema, workspaceSchema } from "../libs/validate-schema.js";
+import { createWorkspace } from "../controllers/workspace.js";
 
 const router = express.Router();
 
@@ -52,5 +53,6 @@ router.post(
     }),
     verifyResetPasswordTokenAndResetPassword 
 );
+
 
 export default router;

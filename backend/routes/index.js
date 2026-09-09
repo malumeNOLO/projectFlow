@@ -1,11 +1,10 @@
 import express from "express";
-
+import workspaceRoutes from "./workspace.js"
 import authRoutes from "./auth.js";
 
 const router = express.Router(); 
 
-const port = 5000;
-
 router.use("/auth", authRoutes);
+router.use("/workspaces", workspaceRoutes)
 
 export default router;
