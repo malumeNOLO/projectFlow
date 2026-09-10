@@ -24,7 +24,7 @@ const projectSchema = new Schema(
         startDate: {
             type: Date,
         },
-        endDate: {
+        dueDate: {
             type: Date,
         },
         progress: {

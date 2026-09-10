@@ -98,6 +98,7 @@ export const projectSchema = z.object({
         })
     )
     .optional(),
+    tags: z.string().optional(),
 });
 
 /* ---------- Types ---------- */
