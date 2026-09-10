@@ -1,7 +1,8 @@
 export interface User {
-    id: string;
+    _id: string;
     name: string;
     email: string;
+    avatar?:string;
     createdAt: Date;
     isEmailVerified: boolean;
     updatedAt: Date;
@@ -43,7 +44,7 @@ export interface Project {
     tasks: Task[];
     members: {
         user: User;
-        role: "admin" | "members" | "owner" | "viewer";
+        role: "admin" | "member" | "owner" | "viewer";
     }[];
     createdAt: Date;
     updatedAt: Date;

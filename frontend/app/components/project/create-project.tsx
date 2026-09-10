@@ -11,8 +11,9 @@ import { Textarea } from "../ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "../ui/select";
 import { Calendar } from "../ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { format } from "date-fns";
+import { Checkbox } from "../ui/checkbox";
 
 
 interface CreateProjectDialogProps {
@@ -24,7 +25,7 @@ interface CreateProjectDialogProps {
 
 export type CreateProjectFormData = z.infer<typeof projectSchema>;
 
-export const CrreateProjectDialog = ({
+export const CreateProjectDialog = ({
 
     isOpen,
     onOpenChange,
@@ -227,9 +228,226 @@ export const CrreateProjectDialog = ({
                     </FieldError>
                     )}
                 </Field>
-
                 
+                <Field>
+                    <FieldLabel>Members</FieldLabel>
 
+    <Popover>
+        <PopoverTrigger asChild>
+            <Button
+                type="button"
+                variant="outline"
+                className="w-full justify-start text-left font-normal min-h-11">
+                <span className="truncate text-muted-foreground">
+                    {(() => {
+                        const selectedMembers =
+                            form.watch("members") ?? [];
+
+                        if (selectedMembers.length === 0) {
+                            return "Select Members";
+                        }
+
+                        if (selectedMembers.length === 1) {
+                            const selected =
+                                workspaceMembers.find(
+                                    (member) =>
+                                        member.user?._id ===
+                                        selectedMembers[0].user
+                                );
+
+                            return (
+                                selected?.user?.name ??
+                                "1 member selected"
+                            );
+                        }
+
+                        return `${selectedMembers.length} members selected`;
+                    })()}
+                </span>
+
+                <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" />
+            </Button>
+        </PopoverTrigger>
+
+        <PopoverContent
+            align="start"
+            side="bottom"
+            sideOffset={5}
+            className="z-[9999] w-[450px] bg-background p-2 shadow-lg"
+        >
+            <div className="max-h-[300px] overflow-y-auto">
+                {workspaceMembers.length > 0 ? (
+                    workspaceMembers.map((member) => {
+                        const memberId = member.user?._id;
+
+                        if (!memberId) {
+                            return null;
+                        }
+
+                        const selectedMembers =
+                            form.watch("members") ?? [];
+
+                        const selectedMember =
+                            selectedMembers.find(
+                                (selectedMember) =>
+                                    selectedMember.user === memberId
+                            );
+
+                        const isSelected =
+                            !!selectedMember;
+
+                        return (
+                            <div
+                                key={member._id}
+                                className="flex items-center gap-3 rounded-md p-3 hover:bg-muted"
+                            >
+                                {/* Member checkbox */}
+                                <Checkbox
+                                    id={`member-${memberId}`}
+                                    checked={isSelected}
+                                    onCheckedChange={(checked) => {
+                                        const currentMembers =
+                                            form.getValues("members") ??
+                                            [];
+
+                                        if (checked) {
+                                            if (
+                                                currentMembers.some(
+                                                    (selectedMember) =>
+                                                        selectedMember.user ===
+                                                        memberId
+                                                )
+                                            ) {
+                                                return;
+                                            }
+
+                                            form.setValue(
+                                                "members",
+                                                [
+                                                    ...currentMembers,
+                                                    {
+                                                        user: memberId,
+                                                        role: "member",
+                                                    },
+                                                ],
+                                                {
+                                                    shouldValidate: true,
+                                                    shouldDirty: true,
+                                                }
+                                            );
+                                        } else {
+                                            form.setValue(
+                                                "members",
+                                                currentMembers.filter(
+                                                    (selectedMember) =>
+                                                        selectedMember.user !==
+                                                        memberId
+                                                ),
+                                                {
+                                                    shouldValidate: true,
+                                                    shouldDirty: true,
+                                                }
+                                            );
+                                        }
+                                    }}
+                                />
+
+                                {/* Member information */}
+                                <label
+                                    htmlFor={`member-${memberId}`}
+                                    className="min-w-0 flex-1 cursor-pointer"
+                                >
+                                    <p className="truncate text-sm font-medium">
+                                        {member.user?.name ??
+                                            "Unnamed member"}
+                                    </p>
+
+                                    <p className="truncate text-xs text-muted-foreground">
+                                        {member.user?.email ??
+                                            "No email"}
+                                    </p>
+                                </label>
+
+                                {/* Role field */}
+                                <Field className="w-[120px]">
+                                    <Select
+                                        value={
+                                            selectedMember?.role ??
+                                            "member"
+                                        }
+                                        onValueChange={(role) => {
+                                            const currentMembers =
+                                                form.getValues(
+                                                    "members"
+                                                ) ?? [];
+
+                                            form.setValue(
+                                                "members",
+                                                currentMembers.map(
+                                                    (item) =>
+                                                        item.user ===
+                                                        memberId
+                                                            ? {
+                                                                  ...item,
+                                                                  role: role as
+                                                                      | "member"
+                                                                      | "admin"
+                                                                      | "viewer",
+                                                              }
+                                                            : item
+                                                ),
+                                                {
+                                                    shouldValidate: true,
+                                                    shouldDirty: true,
+                                                }
+                                            );
+                                        }}
+                                        disabled={!isSelected}
+                                    >
+                                        <SelectTrigger className="w-[120px]">
+                                            <SelectValue placeholder="Role" />
+                                        </SelectTrigger>
+
+                                        <SelectContent className="z-[10000]">
+                                            <SelectItem value="member">
+                                                Member
+                                            </SelectItem>
+
+                                            <SelectItem value="admin">
+                                                Admin
+                                            </SelectItem>
+
+                                            <SelectItem value="viewer">
+                                                Viewer
+                                            </SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </Field>
+
+                                {/* Selected indicator */}
+                                {isSelected && (
+                                    <Check className="h-4 w-4 shrink-0" />
+                                )}
+                            </div>
+                        );
+                    })
+                ) : (
+                    <p className="p-3 text-sm text-muted-foreground">
+                        No members available.
+                    </p>
+                )}
+            </div>
+        </PopoverContent>
+
+    </Popover>
+
+    {form.formState.errors.members && (
+        <FieldError>
+            {form.formState.errors.members.message}
+        </FieldError>
+    )}
+                </Field>
+                
                 <Button type="submit">
                     Create Project
                 </Button>

@@ -88,7 +88,7 @@ export const Header = ({
                         <Avatar className="w-8 h-8">
                             <AvatarImage src={user?.profilePicture} />
                                <AvatarFallback className="bg-black text-white">
-                                   {user?.name?.charAt(0).toUpperCase()}
+                                   {user?.name?.charAt(0).toUpperCase() || "B"}
                                </AvatarFallback>
                         </Avatar>
                      </button>

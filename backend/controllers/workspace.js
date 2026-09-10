@@ -71,7 +71,7 @@ const getWorkspaceProjects = async (req, res) => {
         const workspace = await Workspace.findOne({
             _id: workspaceId,
             "members.user": req.user._id,
-        }).populate("members.user", "name email profilePicture");
+        }).populate("members.user", "name email avatar");
 
         if (!workspace) {
             return res.status(404).json({
