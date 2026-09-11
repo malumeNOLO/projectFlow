@@ -14,6 +14,8 @@ import { Popover, PopoverContent, PopoverTrigger} from "../ui/popover";
 import { CalendarIcon, Check, ChevronsUpDown } from "lucide-react";
 import { format } from "date-fns";
 import { Checkbox } from "../ui/checkbox";
+import { UseCreateProject } from "@/hooks/use-project";
+import { toast } from "sonner";
 
 
 interface CreateProjectDialogProps {
@@ -46,8 +48,26 @@ export const CreateProjectDialog = ({
         },
     });
 
-    const onSubmit = (data: CreateProjectFormData) => {
-        console.log(data);
+    const { mutate , isPending } = UseCreateProject();
+
+    const onSubmit = (values: CreateProjectFormData) => {
+        if (!workspaceId) return;
+
+        mutate({
+            projectData: values,
+            workspaceId,
+        },{
+            onSuccess:() => {
+                toast.success("Project created successfully");
+                form.reset();
+                onOpenChange(false);
+            },
+            onError: (error: any) => {
+                const errorMessage = error.response.data.message;
+                toast.error("Failed to create project");
+                console.log(error);
+            },
+        });
     };
 
     return (
@@ -327,7 +347,7 @@ export const CreateProjectDialog = ({
                                                     ...currentMembers,
                                                     {
                                                         user: memberId,
-                                                        role: "owner",
+                                                        role: "manager",
                                                     },
                                                 ],
                                                 {
@@ -452,8 +472,8 @@ export const CreateProjectDialog = ({
                                     )}
                                 </Field>
                 
-                            <Button type="submit">
-                                Create Project
+                            <Button type="submit" disabled={isPending}>
+                                {isPending ? "Creating" : "Create Project"}
                             </Button>
                         </form>
                     </DialogContent>
