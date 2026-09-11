@@ -18,7 +18,7 @@ export interface Workspace{
     members :{
         _id: string;
         user: User ;
-        role: "admin" | "member" | "owner" | "viewer";
+        role: "contributor" | "manager" | "owner" | "viewer";
         joinedAt: Date;
     }[];
     createdAt: Date;
@@ -44,7 +44,7 @@ export interface Project {
     tasks: Task[];
     members: {
         user: User;
-        role: "admin" | "member" | "owner" | "viewer";
+        role: "contributor" | "manager" | "owner" | "viewer";
     }[];
     createdAt: Date;
     updatedAt: Date;
@@ -92,6 +92,6 @@ export interface Attachment {
 export interface MemberProps {
     _id: string;
     user: User;
-    role: "admin" | "member" | "owner" | "viewer";
+    role: "contributor" | "manager" | "owner" | "viewer";
     joinedAt: Date;
 }

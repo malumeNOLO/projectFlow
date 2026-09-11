@@ -327,7 +327,7 @@ export const CreateProjectDialog = ({
                                                     ...currentMembers,
                                                     {
                                                         user: memberId,
-                                                        role: "member",
+                                                        role: "owner",
                                                     },
                                                 ],
                                                 {
@@ -390,8 +390,9 @@ export const CreateProjectDialog = ({
                                                             ? {
                                                                   ...item,
                                                                   role: role as
-                                                                      | "member"
-                                                                      | "admin"
+                                                                        "owner"
+                                                                      | "manager"
+                                                                      | "contributor"
                                                                       | "viewer",
                                                               }
                                                             : item
@@ -409,12 +410,15 @@ export const CreateProjectDialog = ({
                                         </SelectTrigger>
 
                                         <SelectContent className="z-[10000]">
-                                            <SelectItem value="member">
-                                                Member
+                                            <SelectItem value="owner">
+                                                Owner
+                                            </SelectItem>
+                                            <SelectItem value="manager">
+                                                Manager
                                             </SelectItem>
 
-                                            <SelectItem value="admin">
-                                                Admin
+                                            <SelectItem value="contributor">
+                                                Contributor
                                             </SelectItem>
 
                                             <SelectItem value="viewer">
@@ -424,34 +428,34 @@ export const CreateProjectDialog = ({
                                     </Select>
                                 </Field>
 
-                                {/* Selected indicator */}
+                                     {/* Selected indicator */}
                                 {isSelected && (
                                     <Check className="h-4 w-4 shrink-0" />
-                                )}
-                            </div>
-                        );
-                    })
-                ) : (
-                    <p className="p-3 text-sm text-muted-foreground">
-                        No members available.
-                    </p>
-                )}
-            </div>
-        </PopoverContent>
+                                            )}
+                                        </div>
+                                        );
+                                    })
+                                ) : (
+                                        <p className="p-3 text-sm text-muted-foreground">
+                                            No members available.
+                                        </p>
+                                    )}
+                                    </div>
+                                </PopoverContent>
 
-    </Popover>
+                                </Popover>
 
-    {form.formState.errors.members && (
-        <FieldError>
-            {form.formState.errors.members.message}
-        </FieldError>
-    )}
-                </Field>
+                                    {form.formState.errors.members && (
+                                <FieldError>
+                                    {form.formState.errors.members.message}
+                                </FieldError>
+                                    )}
+                                </Field>
                 
-                <Button type="submit">
-                    Create Project
-                </Button>
-            </form>
-        </DialogContent>
-    </Dialog>
-    )};
+                            <Button type="submit">
+                                Create Project
+                            </Button>
+                        </form>
+                    </DialogContent>
+                </Dialog>
+            )};

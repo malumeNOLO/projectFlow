@@ -14,7 +14,7 @@ interface WorkspaceHeaderProps {
 export type WorkspaceMember = {
     _id: string;
     user: User;
-    role: "owner" | "admin" | "member" | "viewer";
+    role: "owner" | "contributor" | "manager" | "viewer";
     joinedAt: Date;
   };
 

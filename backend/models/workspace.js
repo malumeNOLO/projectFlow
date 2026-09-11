@@ -18,7 +18,7 @@ const workspaceModel = new Schema ({
             user: { type: Schema.Types.ObjectId, ref: "User" },
             role: {
                 type: String,
-                enum: ["owner", "member", "admin", "viewer"],
+                enum: ["owner", "manager", "contributor", "viewer"],
                 default: "member"
             },
             joinedAt: { type: Date, default: Date.now },
