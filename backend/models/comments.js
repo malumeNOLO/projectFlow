@@ -1,3 +1,5 @@
+import mongoose, { Schema } from "mongoose";
+
 const commentSchema = new Schema(
     {
         text: {
@@ -51,6 +53,6 @@ const commentSchema = new Schema(
     { timestamps: true }
 );
 
-const Comment = model("Comment", commentSchema);
+const Comment = mongoose.model("Comment", commentSchema);
 
 export default Comment;

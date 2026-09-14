@@ -1,4 +1,4 @@
-import { Schema, model } from "mongoose";
+import mongoose, { Schema, model } from "mongoose";
 
 const workspaceModel = new Schema ({
     name: {
@@ -19,7 +19,7 @@ const workspaceModel = new Schema ({
             role: {
                 type: String,
                 enum: ["owner", "manager", "contributor", "viewer"],
-                default: "member"
+                default: "member",
             },
             joinedAt: { type: Date, default: Date.now },
         },
@@ -29,6 +29,6 @@ const workspaceModel = new Schema ({
     { timestamps: true }
 );
 
-const Workspace = model ("Workspace", workspaceModel);
+const Workspace = mongoose.model ("Workspace", workspaceModel);
 
 export default Workspace;
