@@ -10,20 +10,22 @@ export const UseCreateProject = () => {
     mutationFn: async (data: {
       projectData: CreateProjectFormData;
       workspaceId: string;
-    }) => {
-      return postData(
+    }) =>
+      postData(
         `/projects/${data.workspaceId}/create-project`,
         data.projectData
-      );
-    },
+      ),
 
     onSuccess: async (_response, variables) => {
       await Promise.all([
         queryClient.invalidateQueries({
-          queryKey: ["workspace"],
+          queryKey: ["workspace", variables.workspaceId],
         }),
         queryClient.invalidateQueries({
-          queryKey: ["projects"],
+          queryKey: ["workspaces"],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["projects", variables.workspaceId],
         }),
       ]);
     },

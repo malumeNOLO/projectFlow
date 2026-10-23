@@ -1,5 +1,6 @@
 import Workspace from "../models/workspace.js";
 import Project from "../models/project.js";
+import Task from "../models/task.js";
 
 
 const createWorkspace = async (req, res) => {
@@ -80,9 +81,8 @@ const getWorkspaceProjects = async (req, res) => {
         }
 
         const projects = await Project.find({
-            workspace: workspaceId,
-            isArchived: false,
-            members: req.user._id,
+            _id: { $in: workspace.projects },
+            isArchived: { $ne: true },
         })
            .populate("tasks", "status")
            .sort({ createdAt: -1 });

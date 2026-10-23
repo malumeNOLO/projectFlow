@@ -33,7 +33,7 @@ export const ProjectList = ({
                     <ProjectCard
                       key={project._id}
                       project={project}
-                      progress={projectProgress}
+                      progress={0}
                       workspaceId={workspaceId}
                     />
                 )})
