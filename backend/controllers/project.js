@@ -62,8 +62,9 @@ const createProject = async (req, res) => {
                 user: req.user._id,
                 role: "manager",
             });
+        } else {
+            projectMembers[creatorIndex].role = "manager";
         }
-
         const newProject = await Project.create({
             title,
             description,
@@ -167,4 +168,61 @@ const getProjectTasks = async (req, res) => {
     }
 };
 
-export { createProject, getProjectDetails, getProjectTasks };
+const deleteProject = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+
+        const project = await Project.findById(projectId);
+
+        if (!project) {
+            return res.status(404).json({
+                message: "Project not found",
+            });
+        }
+
+        const userId = req.user._id.toString();
+
+        const membership = project.members.find((member) => {
+            const memberId = member.user?._id ?? member.user;
+            return memberId.toString() === userId;
+        });
+
+        if (!membership) {
+            return res.status(403).json({
+                message: "You are not a member of this project",
+            });
+        }
+
+        if (!["manager", "owner", "viewer", "admin"].includes(membership.role)) {
+            return res.status(403).json({
+                message: "You do not have permission to delete this project",
+            });
+            console.log("Current user ID:", userId);
+            console.log("Matched membership:", membership);
+            console.log("Current project role:", membership.role);
+        }
+
+        // Remove tasks belonging to this project.
+        await Task.deleteMany({ project: projectId });
+
+        // Remove the project reference from its workspace.
+        await Workspace.updateOne(
+            { _id: project.workspace },
+            { $pull: { projects: project._id } }
+        );
+
+        await Project.findByIdAndDelete(projectId);
+
+        return res.status(200).json({
+            message: "Project deleted successfully",
+        });
+    } catch (error) {
+        console.error("Delete project error:", error);
+
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+};
+
+export { createProject, getProjectDetails, getProjectTasks, deleteProject };

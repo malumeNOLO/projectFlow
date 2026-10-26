@@ -1,11 +1,10 @@
 import type { Project, Task, TaskStatus } from "@/types";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
-import { UseProjectQuery } from "@/hooks/use-project";
 import { getProjectProgress } from "@/lib";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-
+import { UseProjectQuery,useDeleteProjectMutation } from "@/hooks/use-project";
 import { CreateTaskDialog } from "@/components/task/create-task-dialog";
 
 const ProjectDetails = () => {
@@ -15,6 +14,7 @@ const ProjectDetails = () => {
   }>();
 
   const navigate = useNavigate();
+  const deleteProjectMutation = useDeleteProjectMutation();
 
   const [isCreateTask, setIsCreateTask] = useState(false);
   const [taskFilter, setTaskFilter] = useState<TaskStatus | "All">("All");
@@ -67,6 +67,32 @@ const ProjectDetails = () => {
             className="mb-3"
         > 
             Back
+        </Button>
+
+        <Button
+            variant="destructive"
+            disabled={deleteProjectMutation.isPending}
+            onClick={() => {
+                const confirmed = window.confirm(
+                    `Are you sure you want to permanently delete "${project.title}" and its tasks?`
+            );
+
+            if (confirmed) {
+                deleteProjectMutation.mutate(projectId, {
+                    onSuccess: () => {
+                        navigate(`/workspaces/${workspaceId}`);
+                },
+                onError: (error) => {
+                    console.error("Failed to delete project:", error);
+                    window.alert(
+                        "Failed to delete project. Please check the server logs and try again."
+                    );
+                },
+               });
+              }
+            }}
+            >
+            {deleteProjectMutation.isPending ? "Deleting..." : "Delete"}
         </Button>
 
           <div className="flex items-center gap-3">
