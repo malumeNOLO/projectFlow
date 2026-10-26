@@ -13,5 +13,5 @@ export const CreateTaskDialog = ({
     open,
     onOpenChange,
     projectId,
-    projectMembers,
+    projectMembers
 })
