@@ -101,6 +101,36 @@ export const projectSchema = z.object({
     tags: z.string().optional(),
 });
 
+
+/* ---------- Create Task ---------- */
+
+export const createTaskSchema = z.object({
+    title: z
+        .string()
+        .min(3, "Title must be at least 3 characters"),
+
+    description: z
+        .string()
+        .optional(),
+
+    status: z
+        .enum(["To Do", "In Progress", "Done"])
+        .default("To Do"),
+
+    priority: z
+        .enum(["Low", "Medium", "High"])
+        .default("Medium"),
+
+    assignee: z
+        .string()
+        .min(1, "Please select an assignee"),
+
+    dueDate: z
+        .string()
+        .optional(),
+
+});
+
 /* ---------- Types ---------- */
 
 export type SignUpFormData = z.infer<typeof signUpSchema>;
@@ -109,3 +139,4 @@ export type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>;
 export type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>;   
 export type WorkspaceFormData = z.infer<typeof workspaceSchema>; 
 export type ProjectStatusFormData = z.infer<typeof projectSchema>;
+export type CreateTaskFormData = z.infer<typeof createTaskSchema>;

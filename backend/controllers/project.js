@@ -1,6 +1,6 @@
 import Workspace from "../models/workspace.js";
 import Project from "../models/project.js";
-import Task from "../models/task.js"
+import Task from "../models/task.js";
 
 const createProject = async (req, res) => {
     try {
@@ -35,11 +35,12 @@ const createProject = async (req, res) => {
             });
         }
 
-        const tagArray = tags
-            ? tags.split(",").map((tag) => tag.trim())
-            : [];
+        const tagArray = Array.isArray(tags)
+            ? tags
+            : typeof tags === "string"
+                ? tags.split(",").map((tag) => tag.trim()).filter(Boolean)
+                : [];
 
-        // Convert workspace roles into project roles
         const projectMembers = (members ?? []).map((member) => ({
             user: member.user,
             role:
@@ -49,6 +50,19 @@ const createProject = async (req, res) => {
                         ? "viewer"
                         : "contributor",
         }));
+
+        // Ensure the creator is included in the project members.
+        const creatorIsMember = projectMembers.some(
+            (member) =>
+                member.user.toString() === req.user._id.toString()
+        );
+
+        if (!creatorIsMember) {
+            projectMembers.push({
+                user: req.user._id,
+                role: "manager",
+            });
+        }
 
         const newProject = await Project.create({
             title,
@@ -63,7 +77,6 @@ const createProject = async (req, res) => {
         });
 
         workspace.projects.push(newProject._id);
-
         await workspace.save();
 
         return res.status(201).json(newProject);
@@ -76,12 +89,12 @@ const createProject = async (req, res) => {
     }
 };
 
-const getProjectTasks = async (req, res) => {
-    try{
+const getProjectDetails = async (req, res) => {
+    try {
         const { projectId } = req.params;
 
         const project = await Project.findById(projectId)
-        .populate("members.user", "name email profilePicture");
+            .populate("members.user", "name email profilePicture");
 
         if (!project) {
             return res.status(404).json({
@@ -89,34 +102,69 @@ const getProjectTasks = async (req, res) => {
             });
         }
 
-        const isMember = project.members.some(
-            (member) => member.user._id.toString() === req.user._id.toString()
-        );
+        const isMember = project.members.some((member) => {
+            const memberId = member.user?._id ?? member.user;
+            return memberId.toString() === req.user._id.toString();
+        });
 
         if (!isMember) {
             return res.status(403).json({
                 message: "You are not a member of this project",
-            });  
+            });
+        }
+
+        return res.status(200).json({ project });
+    } catch (error) {
+        console.error("Get project details error:", error);
+
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
+};
+
+const getProjectTasks = async (req, res) => {
+    try {
+        const { projectId } = req.params;
+
+        const project = await Project.findById(projectId)
+            .populate("members.user", "name email profilePicture");
+
+        if (!project) {
+            return res.status(404).json({
+                message: "Project not found",
+            });
+        }
+
+        const isMember = project.members.some((member) => {
+            const memberId = member.user?._id ?? member.user;
+            return memberId.toString() === req.user._id.toString();
+        });
+
+        if (!isMember) {
+            return res.status(403).json({
+                message: "You are not a member of this project",
+            });
         }
 
         const tasks = await Task.find({
             project: projectId,
             isArchived: { $ne: true },
         })
-            .populate("assignees","name profilePicture")
+            .populate("assignee", "name profilePicture")
             .sort({ createdAt: -1 });
 
         return res.status(200).json({
             project,
             tasks,
         });
-        } catch (error) {
-            console.error("Get project tasks error:",error);
+    } catch (error) {
+        console.error("Get project tasks error:", error);
 
-            return res.status(500).json({
-                message: "Internal server error",
-            })
-        }
+        return res.status(500).json({
+            message: "Internal server error",
+        });
+    }
 };
 
 export { createProject, getProjectDetails, getProjectTasks };

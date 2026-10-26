@@ -88,3 +88,15 @@ export const resetPasswordSchema = z.object({
             .string()
             .min(8, "Please confirm your password"),
     });
+/*--------------Task ------------*/
+
+export const taskSchema = z.object({
+    title: z.string().min(3, "Title must be at least 3 characters"),
+    description: z.string().optional(),
+    status: z.enum(["To Do", "In Progress", "Done"]).default("To Do"),
+    priority: z.enum(["Low", "Medium", "High"]).default("Medium"),
+    assignee: z.string().min(1, "Please select an assignee"),
+    dueDate: z.string().optional(),
+    estimatedHours: z.coerce.number().min(0).optional(),
+    tags: z.union([z.string(), z.array(z.string())]).optional(),
+});
