@@ -3,15 +3,22 @@ import { postData } from "@/lib/fetch-utils";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateTaskMutation = () => {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-    return useMutation({
-        mutationFn: (data: { projectId: string; taskData: CreateTaskFormData }) =>
-            postData(`/tasks/${data.projectId}/create-task`, data.taskData),
-        onSuccess: (data: any) => {
-            queryClient.invalidateQueries({
-                queryKey: ["project", data.project],
-            });
-        },
-    });
+  return useMutation({
+    mutationFn: (data: {
+      projectId: string;
+      taskData: CreateTaskFormData;
+    }) =>
+      postData(
+        `/tasks/${data.projectId}/create-task`,
+        data.taskData
+      ),
+
+    onSuccess: async (_response, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["project", variables.projectId],
+      });
+    },
+  });
 };

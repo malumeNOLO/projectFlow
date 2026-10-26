@@ -34,6 +34,7 @@ export enum ProjectStatus {
 
 export interface Project {
     _id: string;
+    id?: string;
     title: string;
     description?: string;
     status: ProjectStatus;
@@ -67,11 +68,11 @@ export interface Subtask {
 }
 
 export interface Task {
-    id: string;
+    _id: string;
     title: string;
     description?: string;
     status: TaskStatus;
-    project: Project;
+    project: Project | string ;
     createdAt: Date;
     updatedAt: Date;
     isArchived: boolean;

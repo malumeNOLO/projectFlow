@@ -184,22 +184,28 @@ const deleteProject = async (req, res) => {
 
         const membership = project.members.find((member) => {
             const memberId = member.user?._id ?? member.user;
-            return memberId.toString() === userId;
+            return memberId?.toString() === userId;
         });
 
-        if (!membership) {
-            return res.status(403).json({
-                message: "You are not a member of this project",
-            });
-        }
+        const creatorId = project.createdBy?._id
+            ?? project.createdBy;
 
-        if (!["manager", "owner", "viewer", "admin"].includes(membership.role)) {
+        const isCreator = creatorId?.toString() === userId;
+
+        const isAuthorizedRole =
+            membership &&
+            ["manager", "owner", "admin"].includes(membership.role);
+
+        console.log("Current user ID:", userId);
+        console.log("Project creator ID:", creatorId?.toString());
+        console.log("Matched membership:", membership);
+        console.log("Current project role:", membership?.role);
+        console.log("Is creator:", isCreator);
+
+        if (!isCreator && !isAuthorizedRole) {
             return res.status(403).json({
                 message: "You do not have permission to delete this project",
             });
-            console.log("Current user ID:", userId);
-            console.log("Matched membership:", membership);
-            console.log("Current project role:", membership.role);
         }
 
         // Remove tasks belonging to this project.
