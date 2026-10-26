@@ -1,6 +1,6 @@
 # ProFlow — Project Management App
 
-ProjectFlow is a web-based project management application designed to help teams organize work, manage projects, track tasks, and collaborate more effectively. It provides a centralized workspace where users can manage projects, assign tasks, monitor progress, and keep track of deadlines.
+ProFlow is a web-based project management application designed to help teams organize work, manage projects, track tasks, and collaborate more effectively. It provides a centralized workspace where users can manage projects, assign tasks, monitor progress, and keep track of deadlines.
 
 ## Features
 
