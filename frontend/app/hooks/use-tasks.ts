@@ -8,12 +8,11 @@ export const useCreateTaskMutation = () => {
   return useMutation({
     mutationFn: (data: {
       projectId: string;
-      taskId: string;
-      status: "To Do" | "In Progress" | "Done";
+      taskData: CreateTaskFormData;
     }) =>
-      updateData(
-        `/tasks/${data.taskId}`,
-        { status: data.status }
+      postData(
+        `/tasks/${data.projectId}/create-task`,
+        data.taskData
       ),
 
     onSuccess: async (_response, variables) => {
@@ -33,6 +32,8 @@ export const useUpdateTaskStatusMutation = () => {
       taskId: string;
       status: "To Do" | "In Progress" | "Done";
     }) => {
+      console.log("Update task data:", data);
+    
       return updateData(`/tasks/${data.taskId}`, {
         status: data.status,
       });

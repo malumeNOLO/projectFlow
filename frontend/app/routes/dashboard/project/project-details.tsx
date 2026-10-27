@@ -8,8 +8,8 @@ import { UseProjectQuery,useDeleteProjectMutation } from "@/hooks/use-project";
 import { CreateTaskDialog } from "@/components/task/create-task-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { TaskColumn } from "@/components/task/task-column";
 import { useUpdateTaskStatusMutation } from "@/hooks/use-tasks";
+import { TaskBoard } from "@/components/task/task-board";
 
 const ProjectDetails = () => {
   const { projectId, workspaceId } = useParams<{
@@ -59,11 +59,19 @@ const ProjectDetails = () => {
       `/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`
     );
   };
-  const handleMarkAsTodo = (taskId: string) => {
+  const handleTaskStatusChange = (
+    taskId: string,
+    status: TaskStatus
+  ) => {
+    if (!taskId || taskId === "undefined") {
+      console.error("Cannot update task: task ID is missing.");
+      return;
+    }
+  
     updateTaskStatusMutation.mutate({
       projectId: projectId!,
       taskId,
-      status: "To Do",
+      status,
     });
   };
 
@@ -113,53 +121,14 @@ const ProjectDetails = () => {
     </div>
   </div>
 
+  
   <TabsContent value="all" className="mt-4">
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-      <TaskColumn
-        title="To Do"
-        tasks={tasks.filter((task) => task.status === "To Do")}
-        onTaskClick={handleTaskClick}
-      />
-
-      <TaskColumn
-        title="In Progress"
-        tasks={tasks.filter((task) => task.status === "In Progress")}
-        onTaskClick={handleTaskClick}
-        onMarkAsTodo={handleMarkAsTodo}
-      />
-
-      <TaskColumn
-        title="Done"
-        tasks={tasks.filter((task) => task.status === "Done")}
-        onTaskClick={handleTaskClick}
-        onMarkAsTodo={handleMarkAsTodo}
-      />
-    </div>
-  </TabsContent>
-
-  <TabsContent value="todo" className="mt-4">
-    <TaskColumn
-      title="To Do"
-      tasks={tasks.filter((task) => task.status === "To Do")}
-      onTaskClick={handleTaskClick}
-    />
-  </TabsContent>
-
-  <TabsContent value="in-progress" className="mt-4">
-    <TaskColumn
-      title="In Progress"
-      tasks={tasks.filter((task) => task.status === "In Progress")}
-      onTaskClick={handleTaskClick}
-    />
-  </TabsContent>
-
-  <TabsContent value="done" className="mt-4">
-    <TaskColumn
-      title="Done"
-      tasks={tasks.filter((task) => task.status === "Done")}
-      onTaskClick={handleTaskClick}
-    />
-  </TabsContent>
+  <TaskBoard
+    tasks={tasks}
+    onTaskClick={handleTaskClick}
+    onStatusChange={handleTaskStatusChange}
+  />
+</TabsContent>
 </Tabs>
 
         </div>
