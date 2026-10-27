@@ -1,7 +1,7 @@
 import Project from "../models/project.js";
 import Task from "../models/task.js";
 
-const createTask = async (req, res) => {
+ export const createTask = async (req, res) => {
     try {
         const { projectId } = req.params;
 
@@ -88,4 +88,38 @@ const createTask = async (req, res) => {
     }
 };
 
-export { createTask };
+export const updateTask = async (req, res) => {
+    try {
+      const { taskId } = req.params;
+      const { status } = req.body;
+  
+      const allowedStatuses = ["To Do", "In Progress", "Done"];
+  
+      if (!allowedStatuses.includes(status)) {
+        return res.status(400).json({
+          message: "Invalid task status",
+        });
+      }
+  
+      const task = await Task.findByIdAndUpdate(
+        taskId,
+        { status },
+        { new: true, runValidators: true }
+      );
+  
+      if (!task) {
+        return res.status(404).json({
+          message: "Task not found",
+        });
+      }
+  
+      return res.status(200).json({
+        message: "Task updated successfully",
+        task,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        message: "Failed to update task",
+      });
+    }
+  };

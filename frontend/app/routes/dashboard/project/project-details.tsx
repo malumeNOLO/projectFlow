@@ -9,6 +9,7 @@ import { CreateTaskDialog } from "@/components/task/create-task-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { TaskColumn } from "@/components/task/task-column";
+import { useUpdateTaskStatusMutation } from "@/hooks/use-tasks";
 
 const ProjectDetails = () => {
   const { projectId, workspaceId } = useParams<{
@@ -18,7 +19,7 @@ const ProjectDetails = () => {
 
   const navigate = useNavigate();
   const deleteProjectMutation = useDeleteProjectMutation();
-
+  const updateTaskStatusMutation = useUpdateTaskStatusMutation();
   const [isCreateTask, setIsCreateTask] = useState(false);
   const [taskFilter, setTaskFilter] = useState<TaskStatus | "All">("All");
 
@@ -57,6 +58,13 @@ const ProjectDetails = () => {
     navigate(
       `/workspaces/${workspaceId}/projects/${projectId}/tasks/${taskId}`
     );
+  };
+  const handleMarkAsTodo = (taskId: string) => {
+    updateTaskStatusMutation.mutate({
+      projectId: projectId!,
+      taskId,
+      status: "To Do",
+    });
   };
 
   return (
@@ -117,12 +125,14 @@ const ProjectDetails = () => {
         title="In Progress"
         tasks={tasks.filter((task) => task.status === "In Progress")}
         onTaskClick={handleTaskClick}
+        onMarkAsTodo={handleMarkAsTodo}
       />
 
       <TaskColumn
         title="Done"
         tasks={tasks.filter((task) => task.status === "Done")}
         onTaskClick={handleTaskClick}
+        onMarkAsTodo={handleMarkAsTodo}
       />
     </div>
   </TabsContent>
