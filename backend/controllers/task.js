@@ -123,3 +123,29 @@ export const updateTask = async (req, res) => {
       });
     }
   };
+
+export const getTaskById = async (req, res) => {
+  try {
+    const { taskId } = req.params;
+
+    const task = await Task.findById(taskId)
+    .populate("assignee", "name profilePicture")
+    .populate("watchers", "name profilePicture");
+
+  if (!task) {
+    return res.status(404).json({
+      message: "Task not found",
+    });
+  }
+
+  const project = await Project.findById(task.project)
+  .populate("members.user", "name profilePicture");
+
+    return res.status(200).json({task, project});
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};

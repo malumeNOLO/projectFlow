@@ -96,7 +96,7 @@ const ProjectDetails = () => {
     setTaskFilter(filters[value]);
   }}
 >
-  <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+<div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
     <TabsList>
       <TabsTrigger value="all">All Tasks</TabsTrigger>
       <TabsTrigger value="todo">To Do</TabsTrigger>
@@ -219,7 +219,7 @@ const ProjectDetails = () => {
       onChange={(e) =>
         setTaskFilter(e.target.value as TaskStatus | "All")
       }
-      className="rounded-md border bg-background px-3 py-2 text-sm"
+      className=" bg-background px-3 py-2 text-sm"
     >
       <option value="All">All tasks</option>
       <option value="To Do">To Do</option>
