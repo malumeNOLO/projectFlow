@@ -53,3 +53,17 @@ export const useTaskByIdQuery = (taskId: string) => {
     queryFn: () => fetchData(`/tasks/${taskId}`),
   })
 }
+
+export const useUpdateTaskTitleMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { taskId: string; title: string }) =>
+      updateData(`/tasks/${data.taskId}/update-title`, {title: data.title}),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({
+        queryKey: ["task", data._id],
+      })
+    }
+  });
+};
