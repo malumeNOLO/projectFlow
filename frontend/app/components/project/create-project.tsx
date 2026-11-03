@@ -141,10 +141,6 @@ export const CreateProjectDialog = ({
                         In Progress
                     </SelectItem>
 
-                    <SelectItem value={ProjectStatus.ON_HOLD}>
-                        On Hold
-                    </SelectItem>
-
                     <SelectItem value={ProjectStatus.COMPLETED}>
                         Completed
                     </SelectItem>
@@ -276,7 +272,7 @@ export const CreateProjectDialog = ({
                                 );
 
                             return (
-                                selected?.user?.name ??
+                                selected?.user?.username ??
                                 "1 member selected"
                             );
                         }
@@ -378,7 +374,7 @@ export const CreateProjectDialog = ({
                                     className="min-w-0 flex-1 cursor-pointer"
                                 >
                                     <p className="truncate text-sm font-medium">
-                                        {member.user?.name ??
+                                        {member.user?.username ||
                                             "Unnamed member"}
                                     </p>
 
@@ -393,7 +389,7 @@ export const CreateProjectDialog = ({
                                     <Select
                                         value={
                                             selectedMember?.role ??
-                                            "member"
+                                            ""
                                         }
                                         onValueChange={(role) => {
                                             const currentMembers =
@@ -410,7 +406,6 @@ export const CreateProjectDialog = ({
                                                             ? {
                                                                   ...item,
                                                                   role: role as
-                                                                        "owner"
                                                                       | "manager"
                                                                       | "contributor"
                                                                       | "viewer",
@@ -430,9 +425,6 @@ export const CreateProjectDialog = ({
                                         </SelectTrigger>
 
                                         <SelectContent className="z-[10000]">
-                                            <SelectItem value="owner">
-                                                Owner
-                                            </SelectItem>
                                             <SelectItem value="manager">
                                                 Manager
                                             </SelectItem>

@@ -27,13 +27,40 @@ export const ProjectList = ({
                 />  
             ) : (
                 projects.map((project) => {
-                    const projectProgress = 0 
+                    const tasks = project.tasks ?? [];
+
+                    const totalTasks = tasks.length;
+
+                    const progress =
+                        totalTasks === 0
+                        ? 0
+                    : Math.round(
+                    (tasks.reduce((total, task) => {
+                      const status = String(task.status)
+                        .toLowerCase()
+                        .replace(/[_-]/g, " ")
+                        .trim();
+
+                      if (["done", "completed"].includes(status)) {
+                        return total + 1;
+                      }
+
+                      if (status === "in progress") {
+                        return total + 0.5;
+                      }
+
+                      return total;
+                    }, 0) /
+                      totalTasks) *
+                      100
+                    );
+
 
                     return (
                     <ProjectCard
                       key={project._id}
                       project={project}
-                      progress={0}
+                      progress={progress}
                       workspaceId={workspaceId}
                     />
                 )})

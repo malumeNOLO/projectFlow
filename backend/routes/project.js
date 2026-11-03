@@ -24,7 +24,6 @@ router.get(
     validateRequest({
         params: z.object({ projectId: z.string() }),
     }),
-    deleteProject,
     getProjectDetails
 );
 

@@ -52,12 +52,12 @@ const createProject = async (req, res) => {
         }));
 
         // Ensure the creator is included in the project members.
-        const creatorIsMember = projectMembers.some(
+        const creatorIndex = projectMembers.findIndex(
             (member) =>
                 member.user.toString() === req.user._id.toString()
         );
 
-        if (!creatorIsMember) {
+        if (creatorIndex === -1) {
             projectMembers.push({
                 user: req.user._id,
                 role: "manager",
@@ -80,6 +80,12 @@ const createProject = async (req, res) => {
         workspace.projects.push(newProject._id);
         await workspace.save();
 
+        // Populate project members with their user details
+        await newProject.populate(
+            "members.user",
+            "username email profilePicture"
+        );
+
         return res.status(201).json(newProject);
     } catch (error) {
         console.error("Create project error:", error);
@@ -95,7 +101,7 @@ const getProjectDetails = async (req, res) => {
         const { projectId } = req.params;
 
         const project = await Project.findById(projectId)
-            .populate("members.user", "name email profilePicture");
+            .populate("members.user", "username email profilePicture");
 
         if (!project) {
             return res.status(404).json({
@@ -129,7 +135,7 @@ const getProjectTasks = async (req, res) => {
         const { projectId } = req.params;
 
         const project = await Project.findById(projectId)
-            .populate("members.user", "name email profilePicture");
+            .populate("members.user", "username email profilePicture");
 
         if (!project) {
             return res.status(404).json({
@@ -152,7 +158,7 @@ const getProjectTasks = async (req, res) => {
             project: projectId,
             isArchived: { $ne: true },
         })
-            .populate("assignee", "name profilePicture")
+            .populate("assignee", "username email profilePicture")
             .sort({ createdAt: -1 });
 
         return res.status(200).json({

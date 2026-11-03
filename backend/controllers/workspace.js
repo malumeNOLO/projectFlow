@@ -15,7 +15,7 @@ const createWorkspace = async (req, res) => {
             members: [
                 {
                     user: req.user._id,
-                    role: "owner"
+                    role: "manager"
                 }
             ]
         });
@@ -52,7 +52,7 @@ const getWorkspaceDetails = async (req, res) => {
         const { workspaceId } = req.params;
 
         const workspace = await Workspace.findById(workspaceId).populate(
-            "members.user", "name email profilePicture"
+            "members.user", "username email profilePicture"
         );
 
         if(!workspace) {
@@ -72,7 +72,7 @@ const getWorkspaceProjects = async (req, res) => {
         const workspace = await Workspace.findOne({
             _id: workspaceId,
             "members.user": req.user._id,
-        }).populate("members.user", "name email avatar");
+        }).populate("members.user", "username email profilePicture");
 
         if (!workspace) {
             return res.status(404).json({

@@ -7,6 +7,7 @@ import type { Project, Task } from "@/types";
 import { ArrowLeft, Eye } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
 import { TaskTitle } from "../../../components/task/task-title";
+import { TaskStatusSelector } from "../../../components/task/task-status-selector";
 
 const TaskDetails = () => {
     const { user } = useAuth();
@@ -104,20 +105,14 @@ const TaskDetails = () => {
 
     {/* Task details */}
     <div className="max-w-4xl rounded-xl border bg-card p-6 shadow-sm">
-      {task.description && (
-        <p className="mb-5 text-sm leading-6 text-muted-foreground">
-          {task.description}
-        </p>
-      )}
-
       <div className="flex flex-wrap items-center gap-3">
         <Badge
           variant={
             task.priority === "High"
               ? "destructive"
               : task.priority === "Medium"
-                ? "default"
-                : "outline"
+              ? "default"
+              : "outline"
           }
           className="rounded-full px-3 py-1"
         >
@@ -125,6 +120,21 @@ const TaskDetails = () => {
         </Badge>
 
         <TaskTitle title={task.title} taskId={task._id} />
+        <div className="flex items-center gap-2 mt-4 md:mt-0">
+          {task.description && (
+          <p className="mb-5 text-sm leading-6 text-muted-foreground">
+            {task.description}
+          </p>
+          )}
+          
+          <div className="flex items-center gap-2 mt-4 md:mt-0">
+        <TaskStatusSelector status={task.status} taskId={task._id} />
+
+        <Button variant="destructive" size="sm" onClick={() => {}} className="hidden md:block">
+          Delete Task
+        </Button>
+        </div>
+        </div>
       </div>
     </div>
     </div>

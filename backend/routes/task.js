@@ -2,7 +2,7 @@ import express from "express";
 import { z } from "zod";
 import { validateRequest } from "zod-express-middleware";
 import { taskSchema } from "../libs/validate-schema.js";
-import { createTask, getTaskById, updateTask } from "../controllers/task.js";
+import { createTask, getTaskById, updateTask, updateTaskTitle} from "../controllers/task.js";
 import authMiddleware from "../middleware/auth-middleware.js";
 
 const router = express.Router();
@@ -32,6 +32,16 @@ router.put(
     }),
     updateTask
   );  
+
+router.put(
+  "/:taskId/update-title",
+  authMiddleware,
+  validateRequest({
+    params: z.object({ taskId: z.string() }),
+    body: z.object({ title: z.string() }),
+  }),
+  updateTaskTitle
+);
 
 router.get(
   "/:taskId",

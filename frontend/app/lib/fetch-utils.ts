@@ -22,6 +22,8 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+
+
 api.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -31,7 +33,11 @@ api.interceptors.response.use(
       error.response?.data ?? error.message
     );
 
-    if (error.response?.status === 401) {
+    const isExpiredToken =
+      error.response?.status === 401 &&
+      error.response?.data?.code === "TOKEN_EXPIRED";
+
+    if (isExpiredToken) {
       window.dispatchEvent(new Event("force-logout"));
     }
 

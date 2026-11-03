@@ -1,3 +1,4 @@
+import { recordActivity } from "../libs/index.js";
 import Project from "../models/project.js";
 import Task from "../models/task.js";
 
@@ -147,5 +148,81 @@ export const getTaskById = async (req, res) => {
     return res.status(500).json({
       message: "Internal server error",
     });
+  }
+};
+
+export const updateTaskTitle = async (req, res) => {
+  try {
+      const { taskId } = req.params;
+      const { title } = req.body;
+
+      // Validate title
+      if (!title || !title.trim()) {
+          return res.status(400).json({
+              message: "Task title is required",
+          });
+      }
+
+      // Find task
+      const task = await Task.findById(taskId);
+
+      if (!task) {
+          return res.status(404).json({
+              message: "Task not found",
+          });
+      }
+
+      // Find associated project
+      const project = await Project.findById(task.project);
+
+      if (!project) {
+          return res.status(404).json({
+              message: "Project not found",
+          });
+      }
+
+      // Check project membership
+      const isMember = project.members.some((member) => {
+          const memberId = member.user?._id ?? member.user;
+
+          return memberId?.toString() === req.user._id.toString();
+      });
+
+      if (!isMember) {
+          return res.status(403).json({
+              message: "You are not a member of this project",
+          });
+      }
+
+      // Update title
+      const oldTitle = task.title;
+
+      task.title = title.trim();
+
+      await task.save();
+
+      // Record activity
+      await recordActivity(
+          req.user._id,
+          "updated_task",
+          "Task",
+          task._id,
+          {
+              description: `Updated task title from ${oldTitle} to ${task.title}`,
+          }
+      );
+
+      return res.status(200).json({
+          message: "Task title updated successfully",
+          task,
+      });
+
+  } catch (error) {
+      console.error("Update task title error:", error);
+
+      return res.status(500).json({
+          message: "Failed to update task title",
+          error: error.message,
+      });
   }
 };
