@@ -23,11 +23,14 @@ export const TaskTitle = ({
                     setIsEditing(false);
                     toast.success("Title updated successfully");
                 },
-                onError: (error: any ) => {
-                    const errorMessage = error.response.data.messsage;
-                    toast.error("Failed to update title");
-                    console.log(error);
-                },
+                onError: (error: any) => {
+                  const errorMessage =
+                      error?.response?.data?.message ||
+                      "Failed to update title";
+              
+                  toast.error(errorMessage);
+                  console.error("Update title error:", error);
+              },
             }
         );
     };

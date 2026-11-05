@@ -8,6 +8,8 @@ import { ArrowLeft, Eye } from "lucide-react";
 import { useNavigate, useParams } from "react-router";
 import { TaskTitle } from "../../../components/task/task-title";
 import { TaskStatusSelector } from "../../../components/task/task-status-selector";
+import { TaskDescription } from "@/components/task/task-description";
+import { format } from "date-fns";
 
 const TaskDetails = () => {
     const { user } = useAuth();
@@ -104,40 +106,79 @@ const TaskDetails = () => {
       </div>
 
     {/* Task details */}
-    <div className="max-w-4xl rounded-xl border bg-card p-6 shadow-sm">
-      <div className="flex flex-wrap items-center gap-3">
-        <Badge
-          variant={
-            task.priority === "High"
-              ? "destructive"
-              : task.priority === "Medium"
-              ? "default"
-              : "outline"
-          }
-          className="rounded-full px-3 py-1"
-        >
-          {task.priority} Priority
-        </Badge>
+    <div className="max-w-4xl rounded-xl border bg-card p-6 shadow-sm space-y-6">
 
-        <TaskTitle title={task.title} taskId={task._id} />
-        <div className="flex items-center gap-2 mt-4 md:mt-0">
-          {task.description && (
-          <p className="mb-5 text-sm leading-6 text-muted-foreground">
-            {task.description}
-          </p>
-          )}
-          
-          <div className="flex items-center gap-2 mt-4 md:mt-0">
-        <TaskStatusSelector status={task.status} taskId={task._id} />
+    {/* Top section */}
+    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
 
-        <Button variant="destructive" size="sm" onClick={() => {}} className="hidden md:block">
-          Delete Task
-        </Button>
-        </div>
+    {/* Priority, title and creation date */}
+    <div className="flex items-center gap-3 flex-wrap">
+
+    <Badge
+      variant={
+        task.priority === "High"
+          ? "destructive"
+          : task.priority === "Medium"
+          ? "default"
+          : "outline"
+      }
+      className="rounded-full px-3 py-1 mt-1"
+    >
+      {task.priority} Priority
+    </Badge>
+
+    <div className="flex flex-col gap-1">
+
+      <TaskTitle
+        title={task.title}
+        taskId={task._id}
+      />
+
+     </div>
+      <p className="text-sm text-muted-foreground">
+        Created on{" "}
+        {format(new Date(task.createdAt), "MMMM d, yyyy")}
+      </p>
+
+  </div>
+
+  {/* Status and delete */}
+  <div className="flex items-center gap-2">
+
+    <TaskStatusSelector
+      status={task.status}
+      taskId={task._id}
+      projectId={
+        typeof task.project === "string"
+          ? task.project
+          : task.project._id
+      }
+    />
+
+    <Button
+      variant="destructive"
+      size="sm"
+      onClick={() => {}}
+      className="hidden md:block"
+    >
+      Delete Task
+    </Button>
+
+  </div>
+</div>
+
+        <div> 
+          <h3 className="text-sm font-medium text-muted-foreground mb-0">
+            Description
+          </h3>
+
+          <TaskDescription 
+              description={task.description} 
+              taskId={task._id} />
         </div>
       </div>
     </div>
-    </div>
+  
   );
 };
 

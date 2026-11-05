@@ -157,10 +157,10 @@ export const updateTaskTitle = async (req, res) => {
       const { title } = req.body;
 
       // Validate title
-      if (!title || !title.trim()) {
-          return res.status(400).json({
-              message: "Task title is required",
-          });
+      if (typeof title !== "string" || !title.trim()) {
+        return res.status(400).json({
+          message: "Task title is required",
+        });
       }
 
       // Find task
@@ -222,6 +222,158 @@ export const updateTaskTitle = async (req, res) => {
 
       return res.status(500).json({
           message: "Failed to update task title",
+          error: error.message,
+      });
+  }
+};
+
+export const updateTaskDescription = async (req, res) => {
+  try {
+      const { taskId } = req.params;
+      const { description } = req.body;
+
+      // Validate description
+      if (typeof description !== "string") {
+          return res.status(400).json({
+              message: "Task description must be a string",
+          });
+      }
+
+      // Find task
+      const task = await Task.findById(taskId);
+
+      if (!task) {
+          return res.status(404).json({
+              message: "Task not found",
+          });
+      }
+
+      // Find associated project
+      const project = await Project.findById(task.project);
+
+      if (!project) {
+          return res.status(404).json({
+              message: "Project not found",
+          });
+      }
+
+      // Check project membership
+      const isMember = project.members.some((member) => {
+          const memberId = member.user?._id ?? member.user;
+
+          return memberId?.toString() === req.user._id.toString();
+      });
+
+      if (!isMember) {
+          return res.status(403).json({
+              message: "You are not a member of this project",
+          });
+      }
+
+      // Save old description
+      const oldDescription = task.description || "";
+
+      // Update description
+      task.description = description;
+
+      await task.save();
+
+      // Record activity
+      await recordActivity(
+          req.user._id,
+          "updated_task",
+          "Task",
+          task._id,
+          {
+              description: `Updated task description from "${oldDescription.substring(0, 50)}" to "${description.substring(0, 50)}"`,
+          }
+      );
+
+      return res.status(200).json({
+          message: "Task description updated successfully",
+          task,
+      });
+
+  } catch (error) {
+      console.error("Update task description error:", error);
+
+      return res.status(500).json({
+          message: "Failed to update task description",
+      });
+  }
+};
+
+export const updateTaskStatus = async (req, res) => {
+  try {
+      const { taskId } = req.params;
+      const { status } = req.body;
+
+      // Validate title
+      if (!status || !status.trim()) {
+          return res.status(400).json({
+              message: "Task status is required",
+          });
+      }
+
+      // Find task
+      const task = await Task.findById(taskId);
+
+      if (!task) {
+          return res.status(404).json({
+              message: "Task not found",
+          });
+      }
+
+      // Find associated project
+      const project = await Project.findById(task.project);
+
+      if (!project) {
+          return res.status(404).json({
+              message: "Project not found",
+          });
+      }
+
+      // Check project membership
+      const isMember = project.members.some((member) => {
+          const memberId = member.user?._id ?? member.user;
+
+          return memberId?.toString() === req.user._id.toString();
+      });
+
+      if (!isMember) {
+          return res.status(403).json({
+              message: "You are not a member of this project",
+          });
+      }
+
+      // Update title
+      const oldStatus = task.status;
+
+      task.status = status.trim();
+
+      await task.save();
+
+      // Record activity
+      await recordActivity(
+          req.user._id,
+          "updated_task",
+          "Task",
+          task._id,
+          {
+              description: `Updated task status from ${oldStatus} to ${task.status}`,
+          }
+      );
+
+      return res.status(200).json({
+          message: "Task status updated successfully",
+          task,
+      });
+
+  } catch (error) {
+      console.error("Update task status error:", error);
+
+      return res.status(500).json({
+          message: "Failed to update task status",
           error: error.message,
       });
   }

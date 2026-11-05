@@ -1,5 +1,6 @@
 import type { CreateTaskFormData } from "@/components/task/create-task-dialog";
 import { fetchData, postData, updateData } from "@/lib/fetch-utils";
+import type { TaskStatus } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateTaskMutation = () => {
@@ -23,6 +24,7 @@ export const useCreateTaskMutation = () => {
   });
 };
 
+
 export const useUpdateTaskStatusMutation = () => {
   const queryClient = useQueryClient();
 
@@ -33,16 +35,21 @@ export const useUpdateTaskStatusMutation = () => {
       status: "To Do" | "In Progress" | "Done";
     }) => {
       console.log("Update task data:", data);
-    
+
       return updateData(`/tasks/${data.taskId}`, {
         status: data.status,
       });
     },
 
     onSuccess: async (_response, variables) => {
-      await queryClient.invalidateQueries({
-        queryKey: ["project", variables.projectId],
-      });
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: ["project", variables.projectId],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: ["task", variables.taskId],
+        }),
+      ]);
     },
   });
 };
@@ -59,11 +66,32 @@ export const useUpdateTaskTitleMutation = () => {
 
   return useMutation({
     mutationFn: (data: { taskId: string; title: string }) =>
-      updateData(`/tasks/${data.taskId}/update-title`, {title: data.title}),
-    onSuccess: (data: any) => {
-      queryClient.invalidateQueries({
-        queryKey: ["task", data._id],
-      })
-    }
+      updateData(`/tasks/${data.taskId}/update-title`, {
+        title: data.title,
+      }),
+
+    onSuccess: async (_response, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["task", variables.taskId],
+      });
+    },
+  });
+};
+
+
+export const useUpdateTaskDescriptionMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { taskId: string; description: string }) =>
+      updateData(`/tasks/${data.taskId}/description`, {
+        description: data.description,
+      }),
+
+    onSuccess: async (_response, variables) => {
+      await queryClient.invalidateQueries({
+        queryKey: ["task", variables.taskId],
+      });
+    },
   });
 };
