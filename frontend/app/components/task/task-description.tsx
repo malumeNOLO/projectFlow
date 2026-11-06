@@ -42,9 +42,7 @@ export const TaskDescription = ({
                onChange={(e) => setNewDescription(e.target.value)}
             /> 
           ) : (
-            <p className="text-xl flex-1 font-semibold">
-              {description || "No description provided"}
-            </p>
+            <div className="text-sm md:text-base text-pretty flex-1 text-muted-foreground">{description}</div>
             )}
 
             {isEditing ? (
@@ -52,7 +50,9 @@ export const TaskDescription = ({
               size="sm"
               onClick={updateDescription}
               disabled={isPending}
-              >Save</Button>
+              >
+                Save
+              </Button>
             ) : ( 
               <Edit 
                 className="size-3 cursor-pointer"

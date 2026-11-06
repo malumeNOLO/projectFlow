@@ -10,6 +10,7 @@ import { TaskTitle } from "../../../components/task/task-title";
 import { TaskStatusSelector } from "../../../components/task/task-status-selector";
 import { TaskDescription } from "@/components/task/task-description";
 import { format } from "date-fns";
+import { TaskAssigneesSelector } from "@/components/task/task-assignees-selector";
 
 const TaskDetails = () => {
     const { user } = useAuth();
@@ -176,6 +177,12 @@ const TaskDetails = () => {
               description={task.description} 
               taskId={task._id} />
         </div>
+
+          <TaskAssigneesSelector
+              task={task}
+              assignees={task.assignees}
+              projectMembers={project.members as any}
+          />
       </div>
     </div>
   
